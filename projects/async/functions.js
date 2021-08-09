@@ -30,23 +30,21 @@ function delayPromise(seconds) {
  Пример:
    loadAndSortTowns().then(towns => console.log(towns)) // должна вывести в консоль отсортированный массив городов
  */
-function loadAndSortTowns() {
-  return fetch('https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json')
-    .then((resp) => {
-      return resp.json();
-    })
-    .then((resp) => {
-      const sort = resp.sort((a, b) => {
-        if (a.name > b.name) {
-          return 1;
-        }
-        if (a.name < b.name) {
-          return -1;
-        }
-        return 0;
-      });
-      return sort;
-    });
+async function loadAndSortTowns() {
+  const resp = await fetch(
+    'https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json'
+  );
+  const resp_1 = await resp.json();
+  const sort = resp_1.sort((a, b) => {
+    if (a.name > b.name) {
+      return 1;
+    }
+    if (a.name < b.name) {
+      return -1;
+    }
+    return 0;
+  });
+  return sort;
 }
 
 export { delayPromise, loadAndSortTowns };
