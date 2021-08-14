@@ -45,8 +45,67 @@ const addButton = homeworkContainer.querySelector('#add-button');
 // таблица со списком cookie
 const listTable = homeworkContainer.querySelector('#list-table tbody');
 
-filterNameInput.addEventListener('input', function () {});
+const cookie = getCookie();
+iterateCookieObj(cookie);
 
-addButton.addEventListener('click', () => {});
+function getCookie() {
+  if (!document.cookie) return;
 
-listTable.addEventListener('click', (e) => {});
+  const cookieAll = document.cookie.split('; ');
+  return cookieAll.reduce((prev, current) => {
+    const [name, value] = current.split('=');
+    prev[name] = value;
+    return prev;
+  }, {});
+}
+
+function iterateCookieObj(cookieObj) {
+  if (!cookieObj) return;
+  listTable.innerHTML = '';
+  for (const key in cookieObj) {
+    if (cookieObj) {
+      createTR(key, cookieObj[key]);
+    }
+  }
+}
+
+function isMatching(full, chunk) {
+  return full.toLowerCase().indexOf(chunk.toLowerCase()) !== -1;
+}
+
+function createTR(name, value) {
+  const tr = document.createElement('tr');
+  tr.innerHTML =
+    '<td>' + name + '</td><td>' + value + '</td><td><button>Удалить</button></td>';
+  listTable.appendChild(tr);
+}
+
+filterNameInput.addEventListener('input', function () {
+  filter();
+});
+
+function filter() {
+  const filterGetCookie = getCookie();
+  const value = filterNameInput.value;
+  for (const key in filterGetCookie) {
+    if (filterGetCookie)
+      if (!isMatching(filterGetCookie[key], value) && !isMatching(key, value)) {
+        delete filterGetCookie[key];
+      }
+  }
+  iterateCookieObj(filterGetCookie);
+}
+
+addButton.addEventListener('click', () => {
+  document.cookie = `${addNameInput.value}=${addValueInput.value}`;
+  filter();
+});
+
+listTable.addEventListener('click', (e) => {
+  if (e.target.tagName === 'BUTTON') {
+    const tr = e.target.closest('tr');
+    const deletedCookie = tr.children[0].textContent;
+    document.cookie = `${deletedCookie}=deleted; max-age=0`;
+    tr.remove();
+  }
+});
